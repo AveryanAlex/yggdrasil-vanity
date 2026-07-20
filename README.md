@@ -30,9 +30,37 @@ Example:
 
 - AMD Radeon RX 6800 XT: 25 MH/s
 - Intel Iris Xe TGL GT2 (integrated in i5-1135G7): 0.67 MH/s
+- AMD Radeon RX 9060 XT: 15.5 MH/s
 
 Feel free to add your results and report hardware-specific issues!
 
 ## Credits
 - [nano-vanity](https://github.com/PlasmaPower/nano-vanity) for ed25519 OpenCL kernel
 - [opencl_brute](https://github.com/bkerler/opencl_brute) for sha512 OpenCL kernel
+
+
+## Fork notes
+
+This fork contains compatibility fixes and additional testing for modern AMD
+GPUs using OpenCL.
+
+Fork maintained by [dimaniojk](https://github.com/dimaniojk).
+
+### Changes in this fork
+
+#### AMD OpenCL compilation fix
+
+The original OpenCL kernel passed pointers with an incorrect level of
+indirection:
+
+```c
+sha512_hash(&key, &hash);
+```
+This caused OpenCL compilation errors on some AMD drivers and GPUs.
+
+It was changed to:
+```c
+sha512_hash(key, hash);
+```
+This allows the kernel to compile and run correctly on the tested AMD OpenCL
+platform.

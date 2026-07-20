@@ -6,7 +6,7 @@ __kernel void generate_pubkey(__global uchar *results __attribute__((aligned(32)
   }
 
   uchar hash[64];
-  sha512_hash(&key, &hash);
+  sha512_hash(key, hash);
   hash[0] &= 248;
   hash[31] &= 63;
   hash[31] |= 64;
