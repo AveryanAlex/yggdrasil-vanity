@@ -26,6 +26,8 @@ Example:
 # or use cargo run --release -- -r "" ... if you want to build from source
 ```
 
+By default only matches with a new record height (leading zero bits of the public key) are reported. Pass `-a` / `--all-matches` to report every match, e.g. when collecting many different address patterns in one run.
+
 ## Benchmarks
 
 - AMD Radeon RX 6800 XT: 25 MH/s

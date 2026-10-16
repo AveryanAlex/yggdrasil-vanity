@@ -47,6 +47,10 @@ pub struct Args {
     /// CSV file to write results to
     #[arg(short = 'f', long)]
     csv_file: Option<String>,
+
+    /// Report every match, not only new height records
+    #[arg(short = 'a', long, default_value_t = false)]
+    all_matches: bool,
 }
 
 fn main() {
@@ -60,6 +64,7 @@ fn main() {
 
 fn main_() {
     let args = Args::parse();
+    handler::ALL_MATCHES.store(args.all_matches, std::sync::atomic::Ordering::Relaxed);
 
     let regexes = match args.regexes.clone() {
         Some(r) => r,
