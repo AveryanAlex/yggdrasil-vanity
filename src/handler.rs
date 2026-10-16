@@ -5,8 +5,11 @@ use regex::Regex;
 
 use std::fs;
 use std::io::Write;
-use std::sync::atomic::{AtomicU8, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU8, Ordering};
 use std::sync::Mutex;
+
+/// Report every regex match instead of only those with a new record height.
+pub static ALL_MATCHES: AtomicBool = AtomicBool::new(false);
 
 pub fn handle_keypair(
     seed: &[u8],
@@ -18,6 +21,7 @@ pub fn handle_keypair(
 ) {
     let leading_zeros = leading_zeros_of_pubkey(pk);
 
+    let all_matches = ALL_MATCHES.load(Ordering::Relaxed);
     let mut str_addr = None;
 
     for ((re, mlz), re_src) in regexes
@@ -25,11 +29,11 @@ pub fn handle_keypair(
         .zip(max_leading_zeros.iter())
         .zip(regex_sources.iter())
     {
-        if mlz.load(Ordering::Relaxed) <= leading_zeros {
+        if all_matches || mlz.load(Ordering::Relaxed) <= leading_zeros {
             let str_addr = str_addr.get_or_insert_with(|| address_for_pubkey(pk).to_string());
 
             if re.is_match(str_addr)
-                && mlz.fetch_max(leading_zeros, Ordering::SeqCst) <= leading_zeros
+                && (all_matches || mlz.fetch_max(leading_zeros, Ordering::SeqCst) <= leading_zeros)
             {
                 {
                     let mut fixed_seed = [0; 32];
